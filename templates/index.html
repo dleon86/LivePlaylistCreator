@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Setlist Playlist Creator</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Create YouTube Playlist from Setlist</h1>
+      <form action="{{ url_for('create_playlist') }}" method="post">
+        <div>
+          <label for="setlist_id">Setlist ID:</label>
+          <input type="text" id="setlist_id" name="setlist_id" required>
+        </div>
+        <button type="submit">Create Playlist</button>
+      </form>
+    </div>
+  </body>
+</html>
