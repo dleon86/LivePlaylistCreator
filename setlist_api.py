@@ -1,7 +1,8 @@
 import requests
 import logging
+import config
 
-SETLIST_FM_API_KEY = 'o-W-zRQa2mwq4K_iGJ0GwFo2gRbr31cUoThh'
+SETLIST_FM_API_KEY = config.SETLIST_FM_API_KEY
 
 logging.basicConfig(level=logging.DEBUG)
 

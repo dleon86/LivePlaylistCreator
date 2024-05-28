@@ -37,13 +37,23 @@ Live Playlist Creator is a Flask web application that allows users to create a Y
     pip install -r requirements.txt
     ```
 
-4. Add your Setlist.fm API key to `setlist_api.py`:
+4. Add your configuration and secrets:
 
-    ```python
-    SETLIST_FM_API_KEY = 'YOUR_SETLIST_FM_API_KEY'
-    ```
+    - Copy the template `config.py` and update it with your details:
 
-5. Add your OAuth 2.0 client secrets to the project root as `client_secret.json`.
+        ```bash
+        cp config.py.template config.py
+        ```
+
+        Update `config.py` with your `SECRET_KEY` and `SETLIST_FM_API_KEY`.
+
+    - Copy the template `client_secret.json` and update it with your details:
+
+        ```bash
+        cp client_secret.json.template client_secret.json
+        ```
+
+        Update `client_secret.json` with your OAuth 2.0 client secrets.
 
 ## Running the Application
 
@@ -53,11 +63,9 @@ Live Playlist Creator is a Flask web application that allows users to create a Y
     python app.py
     ```
 
-2. Open your web browser and navigate to `http://127.0.0.1:5000/`.
+2. Open your web browser and navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
 
-3. Fill in the form with the Setlist ID and your YouTube API key, then submit the form.
-
-4. Follow the authorization flow to grant the necessary permissions.
+3. Follow the instructions to authorize the application with your Google account.
 
 ## Project Structure
 
@@ -65,7 +73,8 @@ Live Playlist Creator is a Flask web application that allows users to create a Y
 - `setlist_api.py`: Contains the function to fetch setlist details from Setlist.fm.
 - `youtube_api.py`: Contains functions to handle YouTube Data API operations.
 - `templates/index.html`: The HTML template for the main page.
-- `client_secret.json`: OAuth 2.0 credentials file (not included in the repository).
+- `config.py.template`: Template for configuration file.
+- `client_secret.json.template`: Template for OAuth 2.0 credentials file.
 
 ## Contributing
 
@@ -77,4 +86,4 @@ Live Playlist Creator is a Flask web application that allows users to create a Y
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

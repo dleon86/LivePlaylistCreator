@@ -1,0 +1,7 @@
+# config.py
+
+# Secret key for session management
+SECRET_KEY = 'your_secret_key_here'
+
+# Setlist.fm API key
+SETLIST_FM_API_KEY = 'your_setlist_fm_api_key_here'

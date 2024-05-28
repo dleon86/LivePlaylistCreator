@@ -5,7 +5,6 @@ import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from flask import session, redirect, request, url_for
 import logging
-import oauthlib.oauth2
 
 # Set up OAuth 2.0 Client ID and Secret from Google API Console
 CLIENT_SECRETS_FILE = "client_secret.json"
@@ -45,7 +44,7 @@ def oauth2callback():
     session['credentials'] = credentials_to_dict(credentials)
     logging.debug(f"OAuth 2.0 credentials stored in session: {session['credentials']}")
 
-    return redirect(url_for('create_playlist'))
+    return redirect(url_for('index'))
 
 def credentials_to_dict(credentials):
     return {'token': credentials.token,
@@ -68,10 +67,11 @@ def search_youtube(song_title, artist_name):
         q=f"{song_title} {artist_name}"
     )
     response = request.execute()
-    if 'items' in response and len(response['items']) > 0:
+    if 'items' in response and len(response['items']) > 0 and 'videoId' in response['items'][0]['id']:
         video_id = response['items'][0]['id']['videoId']
         return video_id
     else:
+        logging.debug(f"Video not found for {song_title} by {artist_name}")
         return None
 
 def create_youtube_playlist(playlist_name, video_ids):

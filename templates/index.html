@@ -8,10 +8,10 @@
   <body>
     <div class="container">
       <h1>Create YouTube Playlist from Setlist</h1>
-      <form action="{{ url_for('create_playlist') }}" method="post">
+      <form action="{{ url_for('submit_setlist') }}" method="post">
         <div>
-          <label for="setlist_id">Setlist ID:</label>
-          <input type="text" id="setlist_id" name="setlist_id" required>
+          <label for="setlist_url">Setlist URL:</label>
+          <input type="text" id="setlist_url" name="setlist_url" required>
         </div>
         <button type="submit">Create Playlist</button>
       </form>
