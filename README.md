@@ -4,7 +4,7 @@ Live Playlist Creator is a Flask web application that allows users to create a Y
 
 ## Features
 
-- Fetches setlist details from Setlist.fm
+- Fetches setlist details from a Setlist.fm URL
 - Searches for songs on YouTube
 - Creates a YouTube playlist with the searched songs
 
@@ -66,6 +66,10 @@ Live Playlist Creator is a Flask web application that allows users to create a Y
 2. Open your web browser and navigate to [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
 
 3. Follow the instructions to authorize the application with your Google account.
+
+4. Input the setlist.fm url for the setlist that you want to make a playlist of.
+
+5. Enjoy your playlist! 
 
 ## Project Structure
 
