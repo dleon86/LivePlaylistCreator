@@ -1,20 +1,119 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Setlist Playlist Creator</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Create YouTube Playlist from Setlist</h1>
-      <form action="{{ url_for('submit_setlist') }}" method="post">
-        <div>
-          <label for="setlist_url">Setlist URL:</label>
-          <input type="text" id="setlist_url" name="setlist_url" required>
-        </div>
-        <button type="submit">Create Playlist</button>
-      </form>
-    </div>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Live Setlist Playlist Creator</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .left, .right {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .left {
+      border-right: 1px solid #ccc;
+    }
+    .title {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .subheader {
+      text-align: center;
+      margin-bottom: 40px;
+      color: #555;
+    }
+    .setlist-details {
+      margin-bottom: 20px;
+    }
+    .track-list {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <h1 class="title">Live Setlist Playlist Creator</h1>
+    <p class="subheader">Create YouTube Playlist from Setlist</p>
+    <form id="setlistForm">
+      <div class="form-group">
+        <label for="setlist_url">Setlist URL:</label>
+        <input type="text" id="setlist_url" name="setlist_url" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Fetch Setlist</button>
+    </form>
+  </div>
+  <div class="right">
+    <div id="setlistDetails" class="setlist-details"></div>
+    <h2>Track List</h2>
+    <div id="tracks" class="track-list"></div>
+    <button id="confirmPlaylist" class="btn btn-success" style="display: none;">Confirm Playlist</button>
+  </div>
+
+  <script>
+    document.getElementById('setlistForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const setlistUrl = document.getElementById('setlist_url').value;
+      const setlistId = setlistUrl.split('-').slice(-1)[0].replace('.html', '');
+
+      fetch(`/fetch_setlist?setlist_id=${setlistId}`)
+        .then(response => response.json())
+        .then(data => {
+          const setlistDetailsDiv = document.getElementById('setlistDetails');
+          const tracksDiv = document.getElementById('tracks');
+          setlistDetailsDiv.innerHTML = '';
+          tracksDiv.innerHTML = '';
+
+          if (data.error) {
+            tracksDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            return;
+          }
+
+          const setlist = data.setlist;
+          const artistName = setlist.artist.name;
+          const eventDate = setlist.eventDate;
+          const venueName = setlist.venue.name;
+          const city = setlist.venue.city.name;
+          const state = setlist.venue.city.state;
+
+          setlistDetailsDiv.innerHTML = `
+            <h3>${artistName}</h3>
+            <p><strong>Date:</strong> ${eventDate}</p>
+            <p><strong>Venue:</strong> ${venueName}</p>
+            <p><strong>Location:</strong> ${city}, ${state}</p>
+          `;
+
+          setlist.sets.set.forEach(set => {
+            set.song.forEach(song => {
+              const songElement = document.createElement('p');
+              songElement.textContent = song.name;
+              tracksDiv.appendChild(songElement);
+            });
+          });
+
+          document.getElementById('confirmPlaylist').style.display = 'block';
+          document.getElementById('confirmPlaylist').onclick = function() {
+            fetch(`/create_playlist?setlist_id=${setlistId}`)
+              .then(response => response.json())
+              .then(data => {
+                if (data.playlist_url) {
+                  window.open(data.playlist_url, '_blank');
+                }
+              });
+          };
+        })
+        .catch(error => {
+          const tracksDiv = document.getElementById('tracks');
+          tracksDiv.innerHTML = `<p>Error fetching setlist: ${error.message}</p>`;
+        });
+    });
+  </script>
+</body>
 </html>

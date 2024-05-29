@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, request, render_template
+from flask import Flask, session, redirect, url_for, request, render_template, jsonify
 from setlist_api import get_setlist_by_id
 from youtube_api import get_authenticated_service, oauth2callback, search_youtube, create_youtube_playlist
 import logging
@@ -16,6 +16,14 @@ def index():
         return get_authenticated_service()
     return render_template('index.html')
 
+@app.route('/fetch_setlist')
+def fetch_setlist():
+    setlist_id = request.args.get('setlist_id')
+    setlist = get_setlist_by_id(setlist_id)
+    if not setlist:
+        return jsonify({"error": "Setlist not found"})
+    return jsonify({"setlist": setlist})
+
 @app.route('/submit_setlist', methods=['POST'])
 def submit_setlist():
     setlist_url = request.form['setlist_url']
@@ -32,16 +40,17 @@ def create_playlist():
         return "Setlist not found"
 
     video_ids = []
-    for song in setlist['sets']['set'][0]['song']:
-        video_id = search_youtube(song['name'], setlist['artist']['name'])
-        if video_id:
-            video_ids.append(video_id)
+    for set in setlist['sets']['set']:
+        for song in set['song']:
+            video_id = search_youtube(song['name'], setlist['artist']['name'])
+            if video_id:
+                video_ids.append(video_id)
 
     # Extract artist, date, city, and state for the playlist title
     artist_name = setlist['artist']['name']
     event_date = setlist['eventDate']
     city = setlist['venue']['city']['name']
-    state = setlist['venue']['city']['state']
+    state = setlist['venue']['city']['stateCode']
 
     playlist_name = f"{artist_name} {event_date} Setlist - {city}, {state}"
     logging.debug(f"Creating YouTube playlist with name: {playlist_name}")
@@ -49,7 +58,7 @@ def create_playlist():
     playlist_id = create_youtube_playlist(playlist_name, video_ids)
     logging.debug(f"YouTube playlist created with ID: {playlist_id}")
 
-    return redirect(f"https://www.youtube.com/playlist?list={playlist_id}")
+    return jsonify({"playlist_url": f"https://www.youtube.com/playlist?list={playlist_id}"})
 
 @app.route('/oauth2callback', methods=['GET'])
 def oauth2callback_route():
