@@ -26,8 +26,8 @@ def get_authenticated_service():
         include_granted_scopes='true')
 
     session['state'] = state
-    logging.debug(f"Redirecting to Google OAuth 2.0 authorization URL: {authorization_url}")
-    return redirect(authorization_url)
+    logging.debug(f"OAuth 2.0 authorization URL: {authorization_url}")
+    return authorization_url
 
 def oauth2callback():
     state = session['state']

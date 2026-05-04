@@ -54,7 +54,8 @@
     <div id="setlistDetails" class="setlist-details"></div>
     <h2>Track List</h2>
     <div id="tracks" class="track-list"></div>
-    <button id="confirmPlaylist" class="btn btn-success" style="display: none;">Confirm Playlist</button>
+    <button id="confirmPlaylist" class="btn btn-success" style="display: none;">Create YouTube Playlist</button>
+    <div id="playlistStatus" style="margin-top: 15px;"></div>
   </div>
 
   <script>
@@ -98,14 +99,37 @@
             });
           });
 
-          document.getElementById('confirmPlaylist').style.display = 'block';
-          document.getElementById('confirmPlaylist').onclick = function() {
-            fetch(`/create_playlist?setlist_id=${setlistId}`)
+          const confirmBtn = document.getElementById('confirmPlaylist');
+          const statusDiv = document.getElementById('playlistStatus');
+          confirmBtn.style.display = 'block';
+          statusDiv.innerHTML = '';
+
+          confirmBtn.onclick = function() {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Creating playlist…';
+            statusDiv.innerHTML = '<p class="text-muted">Searching YouTube for each track — this may take a moment.</p>';
+
+            fetch('/create_playlist', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ setlist_id: setlistId })
+            })
               .then(response => response.json())
               .then(data => {
-                if (data.playlist_url) {
-                  window.open(data.playlist_url, '_blank');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Create YouTube Playlist';
+                if (data.auth_url) {
+                  window.location.href = data.auth_url;
+                } else if (data.playlist_url) {
+                  statusDiv.innerHTML = `<div class="alert alert-success">Playlist created! <a href="${data.playlist_url}" target="_blank">Open on YouTube</a></div>`;
+                } else if (data.error) {
+                  statusDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
                 }
+              })
+              .catch(err => {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Create YouTube Playlist';
+                statusDiv.innerHTML = `<div class="alert alert-danger">Request failed: ${err.message}</div>`;
               });
           };
         })
